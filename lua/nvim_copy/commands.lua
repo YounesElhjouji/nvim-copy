@@ -56,7 +56,7 @@ function M.copy_current_buffer_to_clipboard(opts)
     return
   end
 
-  clipboard.copy_to_clipboard_from_files({ file_path }, "Git-modified file", { preserve_folds = opts.preserve_folds })
+  clipboard.copy_to_clipboard_from_files({ file_path }, "Current buffer", { preserve_folds = opts.preserve_folds })
 end
 
 -- Copy content of files modified in Git to the clipboard.

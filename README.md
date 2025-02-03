@@ -46,8 +46,6 @@ end,
 }
 ```
 
-> **Note:** Ensure that the Lua module directory is named `nvim_copy` (with an underscore) to match the module requires in the code.
-
 ## Usage
 
 After installation, the following commands become available:
