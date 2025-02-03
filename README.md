@@ -1,6 +1,10 @@
 # nvim-copy
 
-**nvim-copy** is a Neovim plugin written in Lua that allows you to copy the content of files—from visible buffers, Git-modified files, quickfix lists, Harpoon marks, or entire directories—to the clipboard. The plugin supports preserving code folds, making it easier to view folded sections in the copied output.
+**nvim-copy** is a Neovim plugin written in Lua that allows you to copy the content of files—from visible buffers, Git-modified files, quickfix lists, Harpoon marks, or entire directories—to the clipboard. The plugin supports preserving code folds, making it easier to view folded sections in the copied output.  
+It is also highly configurable:
+
+- **Folding:** All commands support the `nofolds` flag to disable preserving fold information.
+- **Recursion:** The copy directory and copy Harpoon commands support the `norecurse` flag to disable recursive file search.
 
 ## Features
 
@@ -13,16 +17,32 @@
 
 ## Installation
 
-Use your favorite plugin manager. For example, with [packer.nvim](https://github.com/wbthomason/packer.nvim):
+### Using packer.nvim
 
 ```lua
 use {
-    'YounesElhjouji/nvim-copy',
-    config = function()
-        -- nvim-copy automatically registers its commands on load.
-        -- Optionally, you can map commands to keybindings:
-        vim.api.nvim_set_keymap('n', '<leader>cb', ':CopyBuffersToClipboard<CR>', { noremap = true, silent = true })
-    end
+'YounesElhjouji/nvim-copy',
+lazy = false, -- ensures the plugin is loaded on startup, even when using lazy.nvim
+config = function()
+-- nvim-copy automatically registers its commands on load.
+-- Optionally, you can map commands to keybindings:
+vim.api.nvim_set_keymap('n', '<leader>cb', ':CopyBuffersToClipboard<CR>', { noremap = true, silent = true })
+end
+}
+```
+
+### Using lazy.nvim
+
+If you're using lazy.nvim, add the following to your lazy configuration to ensure that the plugin is auto-loaded:
+
+```lua
+{
+"YounesElhjouji/nvim-copy",
+lazy = false, -- disables lazy-loading so the plugin is loaded on startup
+config = function()
+-- Optional: additional configuration or key mappings
+vim.api.nvim_set_keymap('n', '<leader>cb', ':CopyBuffersToClipboard<CR>', { noremap = true, silent = true })
+end,
 }
 ```
 
@@ -33,23 +53,31 @@ use {
 After installation, the following commands become available:
 
 - `:CopyBuffersToClipboard`  
-  Copies the content of all visible buffers to the clipboard.
+  Copies the content of all visible buffers to the clipboard.  
+  _Supports the flag:_ `nofolds` (to disable fold preservation).
 
 - `:CopyCurrentBufferToClipboard`  
-  Copies the current buffer’s content to the clipboard.
+  Copies the current buffer’s content to the clipboard.  
+  _Supports the flag:_ `nofolds`.
 
 - `:CopyGitFilesToClipboard`  
-  Copies the content of files modified in Git to the clipboard.
+  Copies the content of files modified in Git to the clipboard.  
+  _Supports the flag:_ `nofolds`.
 
 - `:CopyQuickfixFilesToClipboard`  
-  Copies the content of files from the quickfix list to the clipboard.
+  Copies the content of files from the quickfix list to the clipboard.  
+  _Supports the flag:_ `nofolds`.
 
 - `:CopyHarpoonFilesToClipboard`  
-  Copies the content of files marked in Harpoon to the clipboard.
+  Copies the content of files marked in Harpoon to the clipboard.  
+  _Supports the flags:_
+
+  - `nofolds` (to disable fold preservation)
+  - `norecurse` (to disable recursive search)
 
 - `:CopyDirectoryFilesToClipboard [directory] [flags]`  
   Copies the content of all files in the given directory (or the current buffer’s directory if omitted) to the clipboard.  
-  Flags (optional):
+  _Flags (optional):_
   - `nofolds`: Do not preserve fold information.
   - `norecurse`: Do not traverse directories recursively.
 
