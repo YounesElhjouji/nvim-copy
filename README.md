@@ -17,7 +17,7 @@ Use your favorite plugin manager. For example, with [packer.nvim](https://github
 
 ```lua
 use {
-    'your-github-username/nvim-copy',
+    'YounesElhjouji/nvim-copy',
     config = function()
         -- nvim-copy automatically registers its commands on load.
         -- Optionally, you can map commands to keybindings:

@@ -1,5 +1,5 @@
-local clipboard = require("nvim-copy.clipboard")
-local file_utils = require("nvim-copy.file_utils")
+local clipboard = require("nvim_copy.clipboard")
+local file_utils = require("nvim_copy.file_utils")
 
 local M = {}
 

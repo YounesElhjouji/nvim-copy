@@ -1,6 +1,5 @@
-local utils = require("nvim-copy.utils")
-local file_utils = require("nvim-copy.file_utils")
-local buffer_utils = require("nvim-copy.buffer_utils")
+local utils = require("nvim_copy.utils")
+local buffer_utils = require("nvim_copy.buffer_utils")
 
 local M = {}
 
