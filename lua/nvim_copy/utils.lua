@@ -22,4 +22,26 @@ function M.read_file_content(file_path)
   return table.concat(lines, "\n")
 end
 
+-- Convert a glob (e.g. "*.log") into a Lua pattern.
+-- This is a simple conversion: it escapes Lua magic characters and
+-- replaces '*' with '.*'. (Gitignore matching can be more complex.)
+function M.glob_to_pattern(glob)
+  local pattern = "^" .. glob:gsub("([%^%$%(%)%%%.%+%-%[%]$])", "%%%1")
+      :gsub("%*", ".*") .. "$"
+  return pattern
+end
+
+-- Check if a file/directory path matches any of the ignore patterns.
+-- `ignore_patterns` should be a table of glob strings.
+function M.is_ignored(file_path, ignore_patterns)
+  ignore_patterns = ignore_patterns or {}
+  for _, pattern in ipairs(ignore_patterns) do
+    local lua_pattern = M.glob_to_pattern(pattern)
+    if file_path:match(lua_pattern) then
+      return true
+    end
+  end
+  return false
+end
+
 return M

@@ -165,7 +165,7 @@ function M.copy_harpoon_files_to_clipboard(opts)
     end
   end
 
-  local all_files = file_utils.process_paths(paths, opts.recursive)
+  local all_files = file_utils.process_paths(paths, opts.recursive, opts.ignore)
 
   if #all_files == 0 then
     print("No valid files found in Harpoon marks.")
@@ -195,7 +195,7 @@ function M.copy_directory_files_to_clipboard(directory, opts)
     return
   end
 
-  local all_files = file_utils.process_paths({ directory }, recursive)
+  local all_files = file_utils.process_paths({ directory }, recursive, opts.ignore)
 
   if #all_files == 0 then
     print("No files found in directory: " .. directory)
