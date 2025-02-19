@@ -5,6 +5,7 @@ It is also highly configurable:
 
 - **Folding:** All commands support the `nofolds` flag to disable preserving fold information.
 - **Recursion:** The copy directory and copy Harpoon commands support the `norecurse` flag to disable recursive file search.
+- **Ignore Patterns:** Configure which files or directories should be ignored using Gitignore-style patterns.
 
 ## Features
 
@@ -14,6 +15,7 @@ It is also highly configurable:
 - **Copy Quickfix Files:** Copy files listed in the quickfix list.
 - **Copy Harpoon Files:** Copy files marked with [Harpoon](https://github.com/ThePrimeagen/harpoon).
 - **Copy Directory Files:** Copy all files in a directory (supports recursive search).
+- **Ignore Patterns:** Automatically exclude files and directories using `ignore` settings.
 
 ## Installation
 
@@ -21,28 +23,48 @@ It is also highly configurable:
 
 ```lua
 use {
-'YounesElhjouji/nvim-copy',
-lazy = false, -- ensures the plugin is loaded on startup, even when using lazy.nvim
-config = function()
--- nvim-copy automatically registers its commands on load.
--- Optionally, you can map commands to keybindings:
-vim.api.nvim_set_keymap('n', '<leader>cb', ':CopyBuffersToClipboard<CR>', { noremap = true, silent = true })
-end
+  'YounesElhjouji/nvim-copy',
+  config = function()
+    require("nvim_copy").setup({
+      ignore = {
+        "*node_modules/*",
+        "*__pycache__/*",
+        "*.git/*",
+        "*dist/*",
+        "*build/*",
+        "*.log"
+      }
+    })
+
+    -- Optional key mappings:
+    vim.api.nvim_set_keymap('n', '<leader>cb', ':CopyBuffersToClipboard<CR>', { noremap = true, silent = true })
+  end
 }
 ```
 
 ### Using lazy.nvim
 
-If you're using lazy.nvim, add the following to your lazy configuration to ensure that the plugin is auto-loaded:
+If you're using lazy.nvim, add the following to your lazy configuration:
 
 ```lua
 {
-"YounesElhjouji/nvim-copy",
-lazy = false, -- disables lazy-loading so the plugin is loaded on startup
-config = function()
--- Optional: additional configuration or key mappings
-vim.api.nvim_set_keymap('n', '<leader>cb', ':CopyBuffersToClipboard<CR>', { noremap = true, silent = true })
-end,
+  "YounesElhjouji/nvim-copy",
+  lazy = false, -- ensures the plugin is loaded on startup
+  config = function()
+    require("nvim_copy").setup({
+      ignore = {
+        "*node_modules/*",
+        "*__pycache__/*",
+        "*.git/*",
+        "*dist/*",
+        "*build/*",
+        "*.log"
+      }
+    })
+
+    -- Optional key mappings:
+    vim.api.nvim_set_keymap('n', '<leader>cb', ':CopyBuffersToClipboard<CR>', { noremap = true, silent = true })
+  end,
 }
 ```
 
@@ -50,31 +72,31 @@ end,
 
 After installation, the following commands become available:
 
-- `:CopyBuffersToClipboard`  
-  Copies the content of all visible buffers to the clipboard.  
+- `:CopyBuffersToClipboard`
+  Copies the content of all visible buffers to the clipboard.
   _Supports the flag:_ `nofolds` (to disable fold preservation).
 
-- `:CopyCurrentBufferToClipboard`  
-  Copies the current buffer’s content to the clipboard.  
+- `:CopyCurrentBufferToClipboard`
+  Copies the current buffer’s content to the clipboard.
   _Supports the flag:_ `nofolds`.
 
-- `:CopyGitFilesToClipboard`  
-  Copies the content of files modified in Git to the clipboard.  
+- `:CopyGitFilesToClipboard`
+  Copies the content of files modified in Git to the clipboard.
   _Supports the flag:_ `nofolds`.
 
-- `:CopyQuickfixFilesToClipboard`  
-  Copies the content of files from the quickfix list to the clipboard.  
+- `:CopyQuickfixFilesToClipboard`
+  Copies the content of files from the quickfix list to the clipboard.
   _Supports the flag:_ `nofolds`.
 
-- `:CopyHarpoonFilesToClipboard`  
-  Copies the content of files marked in Harpoon to the clipboard.  
+- `:CopyHarpoonFilesToClipboard`
+  Copies the content of files marked in Harpoon to the clipboard.
   _Supports the flags:_
 
   - `nofolds` (to disable fold preservation)
   - `norecurse` (to disable recursive search)
 
-- `:CopyDirectoryFilesToClipboard [directory] [flags]`  
-  Copies the content of all files in the given directory (or the current buffer’s directory if omitted) to the clipboard.  
+- `:CopyDirectoryFilesToClipboard [directory] [flags]`
+  Copies the content of all files in the given directory (or the current buffer’s directory if omitted) to the clipboard.
   _Flags (optional):_
   - `nofolds`: Do not preserve fold information.
   - `norecurse`: Do not traverse directories recursively.
@@ -85,16 +107,54 @@ After installation, the following commands become available:
 :CopyDirectoryFilesToClipboard /path/to/dir nofolds norecurse
 ```
 
+## Ignore Patterns
+
+`nvim-copy` allows you to configure files and directories that should be ignored when copying directory contents. This is done using `ignore` patterns, which follow a simple glob-like convention.
+
+### Custom Ignore Configuration
+
+You can customize ignore patterns via `setup()`:
+
+```lua
+require("nvim_copy").setup({
+  ignore = { "*tmp/*", "*logs/*.log", "*backup/*" }
+})
+```
+
+This ensures that:
+
+- `tmp/` and its contents are ignored.
+- Any `.log` file inside `logs/` is ignored.
+- `backup/` and all its files are ignored.
+
+### Behavior of Ignore Patterns
+
+| Pattern             | What It Ignores                                        |
+| ------------------- | ------------------------------------------------------ |
+| `"*node_modules/*"` | Any `node_modules/` directory, regardless of depth.    |
+| `"*.log"`           | All files ending in `.log` anywhere in the project.    |
+| `"*dist/*"`         | Any `dist/` directory and all its contents.            |
+| `"*.git/*"`         | Any `.git/` directory and all its contents.            |
+| `"*configs/*"`      | Any `configs/` directory **and everything inside it**. |
+
+> **Note:** Since patterns start with `"*"`, they match paths **anywhere** in the project.
+> This ensures that all instances of `node_modules/` or `dist/`—even deeply nested ones—are ignored.
+
 ## How It Works
 
-1. **File Reading:**  
+1. **File Reading:**
    The plugin reads file content from loaded buffers (or directly from disk if the buffer is not loaded). If the buffer is visible, it uses a window context to preserve folding information.
 
-2. **Content Aggregation:**  
+2. **Content Aggregation:**
    Files are processed and concatenated with a header (showing the file path relative to the project root), then the aggregated content is set to the clipboard.
 
-3. **Command Registration:**  
+3. **Command Registration:**
    Commands are registered automatically when the plugin is loaded via the `plugin/nvim-copy.vim` loader file.
+
+4. **Ignore Handling:**
+   - The plugin filters files and directories **before** reading them.
+   - Patterns with `"*dir/*"` ignore **all instances** of the directory `dir/` anywhere in the project.
+   - File-based ignores (`"*.log"`) are applied at the file level.
 
 ## Contributing
 

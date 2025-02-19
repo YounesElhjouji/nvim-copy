@@ -36,8 +36,7 @@ function M.setup(global_opts)
   local function wrap_command(fn)
     return function(opts)
       local flags = parse_flags(opts.fargs or {})
-      flags.ignore = M.global_opts.ignore                  -- Pass ignore option
-      print("Ignore patterns:", vim.inspect(flags.ignore)) -- Debug print
+      flags.ignore = M.global_opts.ignore -- Pass ignore option
       fn(flags)
     end
   end
@@ -68,7 +67,6 @@ function M.setup(global_opts)
 
     local flags_opts = parse_flags(flags)
     flags_opts.ignore = M.global_opts.ignore
-    print("Ignore patterns:", vim.inspect(flags_opts.ignore)) -- Debug print
     M.copy_directory_files_to_clipboard(dir, flags_opts)
   end, { nargs = "*" })
 
