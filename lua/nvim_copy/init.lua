@@ -1,14 +1,19 @@
 local commands = require("nvim_copy.commands")
 
--- Immediately register all commands on plugin load.
-commands.setup()
+local M = {}
 
--- Expose public API functions if needed.
-return {
-  copy_buffers_to_clipboard         = commands.copy_buffers_to_clipboard,
-  copy_git_files_to_clipboard       = commands.copy_git_files_to_clipboard,
-  copy_quickfix_files_to_clipboard  = commands.copy_quickfix_files_to_clipboard,
-  copy_harpoon_files_to_clipboard   = commands.copy_harpoon_files_to_clipboard,
-  copy_directory_files_to_clipboard = commands.copy_directory_files_to_clipboard,
-  copy_current_buffer_to_clipboard  = commands.copy_current_buffer_to_clipboard,
+-- Default options
+M.options = {
+  ignore = {} -- Default empty list
 }
+
+-- Setup function to allow users to configure options
+function M.setup(opts)
+  -- Ensure the options are updated globally
+  M.options = vim.tbl_deep_extend("force", M.options, opts or {})
+
+  -- Register commands with updated options
+  commands.setup(M.options)
+end
+
+return M
